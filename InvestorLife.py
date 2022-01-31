@@ -5,7 +5,7 @@ from os import name
 from pickle import NONE
 from datetime import timedelta, date
 import random
-def clear(): os.system('cls') #on Windows System
+def clear(): os.system('cls')
 
 
 class Game:
@@ -22,14 +22,8 @@ class Game:
 
     def printGame(self):
         print("Date: {}".format(self.date.strftime("%B %d, %Y")))
-        print("Cash: {} | Invested: {}".format(format(person.cash, '.2f'), format(person.investedCash, '.2f')))
-
-    def printActivities(self):
-        print("\nGo to:")
-        print(" W - go to work(7 days, {} USD)".format(format(job.salary, '.2f')))
-        print(" S - school(31 days, new salary {} USD)".format(format(job.salary*1.1, '.2f')))
-        print(" I - invest money")
-        print(" T - transfer invested money to bank")
+        print("Cash: {} | Invested: {}".format(
+            format(person.cash, '.2f'), format(person.investedCash, '.2f')))
 
     def printErr(self):
         print("\n{}".format(game.err))
@@ -46,6 +40,12 @@ class Person:
     def recalcInvest(self):
         self.investedCash *= random.uniform(0.97, 1.035)
 
+    def printActivities(self):
+        print("\nGo to:")
+        print(" W - go to work(7 days, {} USD)".format(format(job.salary, '.2f')))
+        print(" S - school(31 days, cost: 200USD, new salary {} USD)".format(format(job.salary*1.2, '.2f')))
+        print(" I - invest money")
+        print(" T - transfer invested money to bank")
 
 class Job:
     def __init__(self):
@@ -59,7 +59,7 @@ job = Job()
 while game.date < game.endDate:
     clear()
     game.printGame()
-    game.printActivities()
+    person.printActivities()
     game.printErr()
     choice = input("Your choice? ")
     choice = choice.upper()
@@ -68,12 +68,24 @@ while game.date < game.endDate:
         game.addDay(7)
 
     if choice == "S":
-        job.salary *= 1.3
-        game.addDay(31)
+        if person.cash < 200:
+            game.err = "Not enough funds!"
+            continue
+        else:
+            person.cash -= 200
+            job.salary *= 1.2
+            game.addDay(31)
 
     if choice == "I":
-        invest = input("How much do you want to invest?")
-        invest = int(invest)
+        invest = input("How much do you want to invest?['a' = all] ")
+        if invest == "a":
+            invest = person.cash
+        else:
+            try:
+                invest = float(invest)
+            except:
+                game.err = "Wrong input!"
+                continue
         if invest > person.cash:
             game.err = "Not enough funds!"
             continue
@@ -82,8 +94,15 @@ while game.date < game.endDate:
             person.cash -= invest
 
     if choice == "T":
-        invest = input("How much do you want to transfer?")
-        invest = int(invest)
+        invest = input("How much do you want to transfer?['a' = all] ")
+        if invest == "a":
+            invest = person.investedCash
+        else:
+            try:
+                invest = float(invest)
+            except:
+                game.err = "Wrong input!"
+                continue
         if invest > person.investedCash:
             game.err = "Not enough funds!"
             continue
@@ -91,6 +110,8 @@ while game.date < game.endDate:
             person.cash += invest
             person.investedCash -= invest
 
-print("Game over!")
+clear()
+game.printGame()
+print("\nGame over!")
 print("Net worth: {}".format(person.cash+person.investedCash))
 input("Press enter to exit")
