@@ -26,7 +26,10 @@ class Game:
         return 0
 
     def clear(self):
-        os.system('cls')
+        command = 'clear'
+        if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
+            command = 'cls'
+        os.system(command)
 
     def printPreGame(self):
         text = "It is "+str(self.date.strftime("%B %d, %Y"))+" and scientists announced, that Earth is gonna be uninhabitable due the global warming approximately in 1 year. There is one solution... Mars. Elon Musk announced, SpaceX is ready to trasport whole civilization to Mars. Ticket costs " + \
