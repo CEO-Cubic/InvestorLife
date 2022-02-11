@@ -1,5 +1,3 @@
-
-
 from mimetypes import init
 import os
 from datetime import timedelta, date
